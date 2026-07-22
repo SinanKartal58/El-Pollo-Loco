@@ -400,6 +400,10 @@ body.portrait-blocked #gameContainer {
     align-items: flex-end;
 }
 
+#mobile-controls:not(.d-none) {
+    display: flex;
+}
+
 .mobileControlsGroup {
     display: flex;
     gap: 12px;
