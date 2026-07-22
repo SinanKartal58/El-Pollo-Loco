@@ -1,0 +1,90 @@
+﻿<!doctype html>
+<html lang="de" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="description" content="El Pollo Loco &ndash; ein 2D-Jump-and-Run-Spiel im Browser">
+    <title>El Pollo Loco</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
+    <link rel="icon" href="img_pollo_locco/img/4_enemie_boss_chicken/1_walk/G2.png" type="image/png">
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="main.js"></script>
+    
+</head>
+<body class="game-start-screen">
+<h1>El pollo loco</h1>
+
+<div id="rotate-warning" aria-live="polite">Bitte Ger&auml;t drehen</div>
+
+
+<div id="gameContainer">
+    <canvas width="720" height="480" id="gameCanvas">
+        Your Browser does not support the HTML5 canvas tag.
+    </canvas>
+
+    <div id="uiButtons">
+        <button class="uiIconButton" id="controls-info-btn" onclick="openDialog('controlsDialog')"
+                aria-label="Tasteninfo" title="Tasteninfo">
+            <img src="img_pollo_locco/img/11. info/tasteninfo.png" alt="">
+        </button>
+        <button class="uiIconButton" id="fullscreen-btn" aria-label="Vollbild umschalten" title="Vollbild">
+            <img src="img_pollo_locco/img/11. info/vollbild.png" alt="">
+        </button>
+    </div>
+
+    <div id="startScreen">
+        <img src="img_pollo_locco/img/9_intro_outro_screens/start/startscreen_1.png"
+             alt="Start Screen showing a preview of the game with background, enemies and player">
+        <button id="startButton" onclick="startGame()" aria-label="Spiel starten" title="Start Game">
+            <span aria-hidden="true">&#9654;</span>
+        </button>
+        <footer>
+            <a href="impressum.html">Impressum</a>
+        </footer>
+    </div>
+
+    <div id="gameOverScreen" class="d-none">
+        <img src="img_pollo_locco/img/9_intro_outro_screens/game_over/you lost.png" alt="Game Over">
+        <div id="gameOverActions" class="endscreen-actions">
+            <button id="restartButton" onclick="restartGame()">Restart</button>
+            <button id="backToMenuButton" onclick="backToMainMenu()">Back to Main Menu</button>
+        </div>
+    </div>
+
+    <div id="win-screen" class="d-none">
+        <h2 class="win-title">YOU WON!</h2>
+        <div id="winScreenActions" class="endscreen-actions">
+            <button id="playAgainButton" onclick="restartGame()" class="win-button">PLAY AGAIN</button>
+            <button id="backToStartButton" onclick="backToMainMenu()" class="win-button">BACK TO MAIN MENU</button>
+        </div>
+    </div>
+
+    <button id="muteButton" onclick="toggleMute(event)" aria-label="Ton umschalten" title="Ton an/aus">
+        &#128266;
+    </button>
+
+    <div id="mobile-controls" class="d-none" aria-label="Mobile Steuerung">
+        <div class="mobileControlsGroup" aria-hidden="true">
+            <button class="touchButton touchButton--round" id="btn-left" aria-label="Nach links">&#9664;</button>
+            <button class="touchButton touchButton--round" id="btn-right" aria-label="Nach rechts">&#9654;</button>
+        </div>
+        <div class="mobileControlsGroup" aria-hidden="true">
+            <button class="touchButton touchButton--round" id="btn-jump" aria-label="Springen">&#9650;</button>
+            <button class="touchButton touchButton--round" id="btn-throw" aria-label="Werfen">D</button>
+        </div>
+    </div>
+
+    <dialog id="controlsDialog" class="gameDialog">
+        <h2>Tasteninfo</h2>
+        <p>Links/Rechts: Pfeiltasten</p>
+        <p>Springen: Leertaste</p>
+        <p>Werfen: D</p>
+        <button class="dialogCloseButton" onclick="closeDialog('controlsDialog')">Schlie&szlig;en</button>
+    </dialog>
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,39 @@
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Node (optional tooling)
+node_modules/
+
+# Build / coverage
+coverage/
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE / editor
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Temp
+*.tmp
+*.temp
+*.swp
+*.bak
