@@ -64,12 +64,6 @@ Example with VS Code Live Server:
 1. Open the project folder in VS Code
 2. Start Live Server on `index.html`
 
-Alternative with Python:
-```bash
-python -m http.server 5500
-```
-Then open `http://localhost:5500`.
-
 ## Live Demo
 - https://sinan-kartal.developerakademie.net/El_Pollo_Loco/
 
