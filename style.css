@@ -807,25 +807,25 @@ footer {
     }
 
     #mobile-controls {
-        bottom: max(10px, env(safe-area-inset-bottom));
-        padding: 0 10px;
+        bottom: max(18px, env(safe-area-inset-bottom));
+        padding: 0 12px;
     }
 
     .mobileControlsGroup {
-        gap: 8px;
+        gap: 10px;
     }
 
     .touchButton {
-        min-width: 52px;
-        height: 52px;
-        font-size: 22px;
+        min-width: 60px;
+        height: 60px;
+        font-size: 24px;
     }
 
     .touchButton--round {
-        min-width: 52px;
-        width: 52px;
-        height: 52px;
-        font-size: 22px;
+        min-width: 60px;
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
     }
 
     .gameDialog {
