@@ -272,7 +272,7 @@ function setupKeyboardListeners() {
 
 
 function shouldUseMobileControls() {
-    return window.innerWidth <= 900 && (
+    return (
         window.matchMedia('(pointer: coarse)').matches ||
         'ontouchstart' in window ||
         navigator.maxTouchPoints > 0
