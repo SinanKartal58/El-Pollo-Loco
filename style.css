@@ -35,6 +35,20 @@ body {
     background-attachment: fixed;
 }
 
+body.immersive-mode {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    overflow: hidden;
+    touch-action: none;
+}
+
+body.immersive-mode h1,
+body.immersive-mode footer {
+    display: none;
+}
+
 h1 {
     font-family: 'Rye', serif;
     font-size: clamp(3.2rem, 7vw, 5.4rem);
@@ -71,6 +85,25 @@ h1 {
     height: min(100vh, calc(100vw / 1.5));
     max-height: none;
     margin: auto;
+}
+
+#gameContainer.immersive-mode {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    max-height: none;
+    aspect-ratio: auto;
+    margin: 0;
+}
+
+body.immersive-mode #gameContainer canvas,
+body.immersive-mode #gameContainer #startScreen,
+body.immersive-mode #gameContainer #gameOverScreen,
+body.immersive-mode #gameContainer #win-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
 }
 
 #gameContainer:fullscreen canvas,
@@ -424,6 +457,7 @@ body.portrait-blocked #gameContainer {
     cursor: pointer;
     touch-action: none;
     user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .touchButton--round {

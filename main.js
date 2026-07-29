@@ -60,6 +60,69 @@ const mobileButtonBindings = [
 ];
 
 
+function getGameContainer() {
+    return document.getElementById('gameContainer');
+}
+
+
+function isNativeFullscreenActive() {
+    return Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+}
+
+
+function enterImmersiveMode() {
+    document.body.classList.add('immersive-mode');
+    const gameContainer = getGameContainer();
+    if (gameContainer) {
+        gameContainer.classList.add('immersive-mode');
+    }
+    updateMobileControlsVisibility();
+}
+
+
+function exitImmersiveMode() {
+    document.body.classList.remove('immersive-mode');
+    const gameContainer = getGameContainer();
+    if (gameContainer) {
+        gameContainer.classList.remove('immersive-mode');
+    }
+    updateMobileControlsVisibility();
+}
+
+
+async function toggleFullscreenMode() {
+    const gameContainer = getGameContainer();
+    if (!gameContainer) return;
+
+    if (isNativeFullscreenActive()) {
+        if (document.exitFullscreen) {
+            await document.exitFullscreen().catch(() => {});
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+        exitImmersiveMode();
+        return;
+    }
+
+    if (document.body.classList.contains('immersive-mode')) {
+        exitImmersiveMode();
+        return;
+    }
+
+    try {
+        if (gameContainer.requestFullscreen) {
+            await gameContainer.requestFullscreen();
+        } else if (gameContainer.webkitRequestFullscreen) {
+            gameContainer.webkitRequestFullscreen();
+        } else {
+            enterImmersiveMode();
+        }
+    } catch {
+        enterImmersiveMode();
+    }
+}
+
+
 function openDialog(id) {
     if (hasGameStarted && id === 'controlsDialog') {
         return;
@@ -236,7 +299,7 @@ function updateOrientationState() {
 function updateMobileControlsVisibility() {
     const mobileControls = document.getElementById('mobile-controls');
     if (!mobileControls) return;
-    const showControls = hasGameStarted && shouldUseMobileControls() && !isPortraitMobile();
+    const showControls = shouldUseMobileControls() && !isPortraitMobile();
     mobileControls.classList.toggle('d-none', !showControls);
 }
 
@@ -334,15 +397,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', () => {
-            const container = document.getElementById('gameContainer');
-            if (!container) return;
-            if (document.fullscreenElement) {
-                document.exitFullscreen().catch(() => {});
-            } else if (container.requestFullscreen) {
-                container.requestFullscreen().catch(() => {});
-            }
+            toggleFullscreenMode().catch(() => {});
         });
     }
+
+    document.addEventListener('fullscreenchange', () => {
+        if (!isNativeFullscreenActive()) {
+            exitImmersiveMode();
+        }
+    });
+    document.addEventListener('webkitfullscreenchange', () => {
+        if (!isNativeFullscreenActive()) {
+            exitImmersiveMode();
+        }
+    });
 
     applyMuteState();
     updateMuteButtonIcon();
