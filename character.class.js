@@ -3,6 +3,10 @@ import SalsaBottle from "./salsa-bottle.class.js";
 import { isLongIdle } from './js/idle-timer.js';
 
 
+/**
+ * Represents the main playable character.
+ * Handles movement, jumping, animation states, damage, and bottle throws.
+ */
 export default class Character extends MovableObject {
     x = 60
     width = 170;
@@ -91,6 +95,9 @@ export default class Character extends MovableObject {
     };
 
     
+    /**
+     * Initializes the player, loads all sprite sets, and starts the animation/game loops.
+     */
     constructor() {
         super().loadImage("img_pollo_locco/img/2_character_pepe/1_idle/idle/I-1.png");
         this.loadImages(this.IMAGES_IDLE_SHORT);
@@ -105,6 +112,9 @@ export default class Character extends MovableObject {
     }
 
     
+    /**
+     * Starts the animation and gameplay update timers.
+     */
     animate() {
         this.startAnimationLoop();
         this.startGameLogicLoop();
@@ -177,6 +187,9 @@ export default class Character extends MovableObject {
     }
 
     
+    /**
+     * Checks whether the player is pressing the throw key and triggers a bottle throw if possible.
+     */
     handleThrow() {
         if (this.isDead()) return;
         const isThrowPressed = this.world.keyboard.KEY_D;
@@ -186,12 +199,7 @@ export default class Character extends MovableObject {
         }
         if (this.throwKeyPressed || this.bottleCount <= 0) return;
         this.throwKeyPressed = true;
-        if (this.otherDirection) {
-            this.bottleCount--;
-            this.world.statusBarBottles.setPercentage(this.bottleCount * 20);
-        } else {
-            this.throw();
-        }
+        this.throw();
     }
 
     
@@ -203,6 +211,10 @@ export default class Character extends MovableObject {
     }
 
     
+    /**
+     * Creates a new salsa bottle projectile and reduces the player’s ammo count.
+     * @returns {void}
+     */
     throw() {
         const now = new Date().getTime();
         if (now - this.lastThrowTime < this.THROW_COOLDOWN) return;
@@ -211,6 +223,8 @@ export default class Character extends MovableObject {
         const throwToRight = !this.otherDirection;
         const pos = this.calculateThrowPosition(throwToRight);
         const bottle = new SalsaBottle(pos.x, pos.y, throwToRight);
+        bottle.speedY = -11;
+        bottle.speedX = throwToRight ? 12 : -12;
         this.world.activeLevel.throwableBottles.push(bottle);
         this.bottleCount--;
         this.world.statusBarBottles.setPercentage(this.bottleCount * 20);

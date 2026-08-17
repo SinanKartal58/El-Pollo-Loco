@@ -55,24 +55,40 @@ export default class Endboss extends MovableObject {
 
     
     startSpriteInterval() {
+        this.currentAnimationState = 'walking';
+
         setInterval(() => {
             if (this.isDead()) {
-                this.playAnimation(this.IMAGES_DEAD);
+                this.setAnimationState('dead', this.IMAGES_DEAD);
             } else if (this.isHurt()) {
-                this.playAnimation(this.IMAGES_HURT);
+                this.setAnimationState('hurt', this.IMAGES_HURT);
             } else if (this.hasBeenTriggered) {
                 const alertDone = this.currentImage >= this.IMAGES_ALERT.length;
-                this.playAnimation(alertDone ? this.IMAGES_WALKING : this.IMAGES_ALERT);
+                this.setAnimationState(alertDone ? 'walking' : 'alert', alertDone ? this.IMAGES_WALKING : this.IMAGES_ALERT);
+            } else {
+                this.setAnimationState('walking', this.IMAGES_WALKING);
             }
         }, 100);
+    }
+
+    setAnimationState(nextState, images) {
+        if (this.currentAnimationState !== nextState) {
+            this.currentImage = 0;
+            this.currentAnimationState = nextState;
+        }
+        this.playAnimation(images);
     }
 
     
     startMovementInterval() {
         setInterval(() => {
             if (!this.world || this.isDead() || this.knockbackActive) return;
-            if (this.world.character.isNearBoss()) this.hasBeenTriggered = true;
-            if (this.hasBeenTriggered && this.currentImage >= this.IMAGES_ALERT.length) this.moveLeft();
+            const bossTriggerX = this.world.activeLevel?.level_end_x ? this.world.activeLevel.level_end_x - 480 : 5200;
+            const distanceToCharacter = this.world.character.x - this.x;
+            const reachedBossZone = this.world.character.x >= bossTriggerX;
+
+            if (reachedBossZone) this.hasBeenTriggered = true;
+            if (this.hasBeenTriggered && reachedBossZone) this.moveLeft();
         }, 1000 / 60);
     }
 

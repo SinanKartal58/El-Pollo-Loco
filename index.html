@@ -27,10 +27,23 @@
     <div id="uiButtons">
         <button class="uiIconButton" id="controls-info-btn" onclick="openDialog('controlsDialog')"
                 aria-label="Tasteninfo" title="Tasteninfo">
-            <img src="img_pollo_locco/img/11. info/tasteninfo.png" alt="">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="M12 10.5v.8"></path>
+                <circle cx="12" cy="7.5" r="1"></circle>
+            </svg>
         </button>
         <button class="uiIconButton" id="fullscreen-btn" aria-label="Vollbild umschalten" title="Vollbild">
-            <img src="img_pollo_locco/img/11. info/vollbild.png" alt="">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 9V5h4"></path>
+                <path d="M20 9V5h-4"></path>
+                <path d="M4 15v4h4"></path>
+                <path d="M20 15v4h-4"></path>
+                <path d="M4 5l6 6"></path>
+                <path d="M20 5l-6 6"></path>
+                <path d="M4 19l6-6"></path>
+                <path d="M20 19l-6-6"></path>
+            </svg>
         </button>
     </div>
 
@@ -72,7 +85,9 @@
         </div>
         <div class="mobileControlsGroup" aria-hidden="true">
             <button class="touchButton touchButton--round" id="btn-jump" aria-label="Springen">&#9650;</button>
-            <button class="touchButton touchButton--round" id="btn-throw" aria-label="Werfen">D</button>
+            <button class="touchButton touchButton--round touchButton--bottle" id="btn-throw" aria-label="Flasche werfen">
+                <img src="img_pollo_locco/img/6_salsa_bottle/1_salsa_bottle_on_ground.png" alt="Flasche werfen">
+            </button>
         </div>
     </div>
 
@@ -80,7 +95,7 @@
         <h2>Tasteninfo</h2>
         <p>Links/Rechts: Pfeiltasten</p>
         <p>Springen: Leertaste</p>
-        <p>Werfen: D</p>
+        <p>Werfen: Flasche / Werfen-Taste</p>
         <button class="dialogCloseButton" onclick="closeDialog('controlsDialog')">Schlie&szlig;en</button>
     </dialog>
 </div>

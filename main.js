@@ -344,6 +344,9 @@ function updateMuteButtonIcon() {
 function setupMobileControls() {
     const setKeyState = (key, isPressed) => {
         keyboard[key] = isPressed;
+        if (key === 'KEY_D' && isPressed && keyboard.SPACE) {
+            keyboard.SPACE = false;
+        }
     };
 
     mobileButtonBindings.forEach(({ id, key }) => {

@@ -1,6 +1,9 @@
 ﻿import MovableObject from "./moveble-object.class.js";
 
 
+/**
+ * Base class for projectiles such as the thrown salsa bottle.
+ */
 export default class ThrowableObject extends MovableObject {
     IMAGES_ROTATION = [
         "img_pollo_locco/img/6_salsa_bottle/1_salsa_bottle_on_ground.png",
@@ -25,10 +28,9 @@ export default class ThrowableObject extends MovableObject {
     rotationInterval = null;
     moveInterval = null;
     splashInterval = null;
-    speedY = 30;
-    speed = 10;
+    speedY = 0;
+    speed = 0;
 
-    
     constructor(startX, startY, throwToRight = false) {
         super();
         this.loadImages(this.IMAGES_ROTATION);
@@ -38,31 +40,38 @@ export default class ThrowableObject extends MovableObject {
         this.throw(startX, startY, throwToRight);
     }
 
-    
     isAboveGround() {
         return !this.isBroken && this.y < this.GROUND_Y;
     }
 
-    
     animate() {
         this.rotationInterval = setInterval(() => {
             this.playAnimation(this.IMAGES_ROTATION);
         }, 60);
 
         this.moveInterval = setInterval(() => {
-            this.x += this.speed;
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.y < this.GROUND_Y) {
+                this.speedY += 0.35;
+            }
         }, 25);
     }
 
-    
+    /**
+     * Initializes the flight path for the bottle and starts the movement animation.
+     * @param {number} startX - X position where the bottle starts
+     * @param {number} startY - Y position where the bottle starts
+     * @param {boolean} throwToRight - Direction of the throw
+     */
     throw(startX, startY, throwToRight) {
         this.x = startX;
         this.y = startY;
         this.isBroken = false;
         this.markedForRemoval = false;
         this.otherDirection = !throwToRight;
-
-        this.applyGravity();
+        this.speedX = throwToRight ? 10 : -10;
+        this.speedY = -8;
         this.animate();
     }
 
@@ -88,6 +97,9 @@ export default class ThrowableObject extends MovableObject {
     }
 
     
+    /**
+     * Stops the bottle motion and plays the impact splash animation.
+     */
     break() {
         if (this.isBroken) return;
         this.isBroken = true;
