@@ -1,6 +1,6 @@
 ﻿import MovableObject, {GROUND_Y} from "./moveble-object.class.js";
 import SalsaBottle from "./salsa-bottle.class.js";
-import { isLongIdle } from './js/idle-timer.js';
+import { isLongIdle } from './idle-timer.js';
 
 
 /**
@@ -120,12 +120,18 @@ export default class Character extends MovableObject {
         this.startGameLogicLoop();
     }
 
-    
+    /**
+     * Starts the animation timer.
+     * @returns {void}
+     */
     startAnimationLoop() {
         setInterval(() => this.updateAnimationFrame(), 50);
     }
 
-    
+    /**
+     * Starts the movement and throw input timer.
+     * @returns {void}
+     */
     startGameLogicLoop() {
         setInterval(() => {
             this.handleMovement();
@@ -133,49 +139,90 @@ export default class Character extends MovableObject {
         }, 1000 / 60);
     }
 
-    
+    /**
+     * Updates the character sprite when the current frame interval has elapsed.
+     * @returns {void}
+     */
     updateAnimationFrame() {
         const now = Date.now();
         const ms = this.getCurrentFrameMs();
         if (now - this.lastFrameAt < ms) return;
         this.lastFrameAt = now;
-
-        if (this.isDead()) {
-            this.playAnimation(this.IMAGES_DEAD);
-        } else if (this.isAboveGround()) {
-            this.playAnimation(this.IMAGES_JUMPING);
-        } else if (this.isHurt()) {
-            this.playAnimation(this.IMAGES_HURT);
-        } else if (this.world.keyboard.RIGHT_ARROW || this.world.keyboard.LEFT_ARROW) {
-            this.playAnimation(this.IMAGES_WALKING);
-        } else if (isLongIdle()) {
-            this.playAnimation(this.IMAGES_IDLE);
-        } else {
-            this.playAnimation(this.IMAGES_IDLE_SHORT);
-        }
+        this.playAnimation(this.getCurrentAnimationImages());
     }
 
+    /**
+     * Gets the sprite sequence for the character's current state.
+     * @returns {string[]} Image paths for the next animation frame.
+     */
+    getCurrentAnimationImages() {
+        if (this.isDead()) {
+            return this.IMAGES_DEAD;
+        }
+        if (this.isAboveGround()) return this.IMAGES_JUMPING;
+        if (this.isHurt()) return this.IMAGES_HURT;
+        if (this.isWalking()) return this.IMAGES_WALKING;
+        return isLongIdle() ? this.IMAGES_IDLE : this.IMAGES_IDLE_SHORT;
+    }
+
+    /**
+     * Checks whether a horizontal movement key is pressed.
+     * @returns {boolean} Whether the character is walking.
+     */
+    isWalking() {
+        return this.world.keyboard.RIGHT_ARROW || this.world.keyboard.LEFT_ARROW;
+    }
+
+    /**
+     * Gets the delay for the current animation state.
+     * @returns {number} Delay in milliseconds.
+     */
     getCurrentFrameMs() {
         if (this.isDead())         return this.FRAME_MS.hurt;
         if (this.isAboveGround())  return this.FRAME_MS.jumping;
         if (this.isHurt())         return this.FRAME_MS.hurt;
-        if (this.world.keyboard.RIGHT_ARROW || this.world.keyboard.LEFT_ARROW) return this.FRAME_MS.walking;
+        if (this.isWalking())      return this.FRAME_MS.walking;
         if (isLongIdle())          return this.FRAME_MS.sleep;
         return this.FRAME_MS.idle;
     }
 
-    
+    /**
+     * Handles the character movement inputs and camera position.
+     * @returns {void}
+     */
     handleMovement() {
-        if (this.isDead()) {
-            if (!this.deathTriggered) {
-                this.deathTriggered = true;
-                setTimeout(() => this.world.showGameOverScreen(), 560);
-            }
-            return;
+        if (this.handleDeath()) return;
+        this.handleJumpInput();
+        this.handleHorizontalMovement();
+        this.updateCamera();
+    }
+
+    /**
+     * Schedules the game-over screen when the character dies.
+     * @returns {boolean} Whether the character is dead.
+     */
+    handleDeath() {
+        if (!this.isDead()) return false;
+        if (!this.deathTriggered) {
+            this.deathTriggered = true;
+            setTimeout(() => this.world.showGameOverScreen(), 560);
         }
-        if (this.world.keyboard.SPACE && !this.isAboveGround()) {
-            this.jump();
-        }
+        return true;
+    }
+
+    /**
+     * Starts a jump when the jump key is pressed on the ground.
+     * @returns {void}
+     */
+    handleJumpInput() {
+        if (this.world.keyboard.SPACE && !this.isAboveGround()) this.jump();
+    }
+
+    /**
+     * Moves the character left or right according to keyboard input.
+     * @returns {void}
+     */
+    handleHorizontalMovement() {
         if (this.world.keyboard.RIGHT_ARROW && this.x < this.world.activeLevel.level_end_x) {
             this.otherDirection = false;
             this.moveRight();
@@ -183,6 +230,13 @@ export default class Character extends MovableObject {
             this.otherDirection = true;
             this.moveLeft();
         }
+    }
+
+    /**
+     * Aligns the camera with the character's horizontal position.
+     * @returns {void}
+     */
+    updateCamera() {
         this.world.camera_x = -this.x + 60;
     }
 
@@ -203,6 +257,11 @@ export default class Character extends MovableObject {
     }
 
     
+    /**
+     * Gets the starting position of a thrown bottle.
+     * @param {boolean} throwToRight Direction of the throw.
+     * @returns {{x: number, y: number}} Bottle starting position.
+     */
     calculateThrowPosition(throwToRight) {
         return {
             x: throwToRight ? this.x + this.width + 30 : this.x - 60,
@@ -212,26 +271,45 @@ export default class Character extends MovableObject {
 
     
     /**
-     * Creates a new salsa bottle projectile and reduces the player’s ammo count.
+     * Creates a new salsa bottle projectile and updates the throw state.
      * @returns {void}
      */
     throw() {
         const now = new Date().getTime();
         if (now - this.lastThrowTime < this.THROW_COOLDOWN) return;
         this.lastThrowTime = now;
+        const bottle = this.createThrowableBottle();
+        this.world.activeLevel.throwableBottles.push(bottle);
+        this.updateThrowState();
+    }
 
+    /**
+     * Creates a bottle with the direction and speed of the current throw.
+     * @returns {SalsaBottle} Configured bottle projectile.
+     */
+    createThrowableBottle() {
         const throwToRight = !this.otherDirection;
         const pos = this.calculateThrowPosition(throwToRight);
         const bottle = new SalsaBottle(pos.x, pos.y, throwToRight);
         bottle.speedY = -11;
         bottle.speedX = throwToRight ? 12 : -12;
-        this.world.activeLevel.throwableBottles.push(bottle);
+        return bottle;
+    }
+
+    /**
+     * Reduces ammunition, updates the status bar, and plays the throw sound.
+     * @returns {void}
+     */
+    updateThrowState() {
         this.bottleCount--;
         this.world.statusBarBottles.setPercentage(this.bottleCount * 20);
         this.world.playSound("throw");
     }
 
-    
+    /**
+     * Checks whether the character is near the end boss area.
+     * @returns {boolean} Whether the character is near the boss.
+     */
     isNearBoss() {
         return this.x > 5073;
     }

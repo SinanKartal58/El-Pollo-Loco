@@ -1,14 +1,9 @@
 ﻿/**
  * Shared game audio configuration and mute state.
  */
-import {
-    BurstSound,
-    LoopSound,
-    PatternLoopSound,
-    ensureAudioContextReady,
-    getAudioContext,
-    playTone
-} from './audio-classes.js';
+import BurstSound from './burst-sound.class.js';
+import LoopSound from './loop-sound.class.js';
+import PatternLoopSound from './pattern-loop-sound.class.js';
 
 const MUTE_STORAGE_KEY = 'elPolloMuted';
 
@@ -20,6 +15,11 @@ try {
     muted = false;
 }
 
+/**
+ * Schedules a tone pattern when audio is not muted.
+ * @param {Array<object>} pattern Tone definitions to play.
+ * @returns {void}
+ */
 function playSoundIfNotMuted(pattern) {
     if (muted) return;
     pattern.forEach((step) => {

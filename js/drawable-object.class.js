@@ -23,20 +23,32 @@ export default class DrawableObject {
     
     get hbHeight() { return this.hitboxH ?? (this.height - this.hitboxY); }
 
-    
+    /**
+     * Draws the current image on the game canvas.
+     * @param {CanvasRenderingContext2D} ctx Canvas context to draw on.
+     * @returns {void}
+     */
     draw(ctx) {
         if (this.img && this.img.complete) {
             ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
         }
     }
 
-    
+    /**
+     * Loads one image as the current object image.
+     * @param {string} path Image file path.
+     * @returns {void}
+     */
     loadImage(path) {
         this.img = new Image();
         this.img.src = path;
     }
 
-    
+    /**
+     * Loads image paths into the object's image cache.
+     * @param {string[]} pathsArray Image file paths to load.
+     * @returns {void}
+     */
     loadImages(pathsArray) {
         pathsArray.forEach((path) => {
             let img = new Image();
@@ -45,7 +57,11 @@ export default class DrawableObject {
         });
     }
 
-    
+    /**
+     * Displays the next image from an animation sequence.
+     * @param {string[]} images Image paths forming the animation.
+     * @returns {void}
+     */
     playAnimation(images) {
         if (!images || images.length === 0) return;
         let i = this.currentImage % images.length;

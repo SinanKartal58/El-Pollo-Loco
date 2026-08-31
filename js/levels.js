@@ -12,6 +12,10 @@ const BACKGROUND_TILE_COUNT = 8;
 const LEVEL_END_X = TILE_WIDTH * (BACKGROUND_TILE_COUNT - 1) + 40;
 const SAFE_ENEMY_MAX_X = LEVEL_END_X - 1120;
 
+/**
+ * Creates the clouds used in the level background.
+ * @returns {Cloud[]} Configured cloud objects.
+ */
 function createClouds() {
     const clouds = [];
     for (let i = 0; i < BACKGROUND_TILE_COUNT + 2; i++) {
@@ -24,6 +28,10 @@ function createClouds() {
     return clouds;
 }
 
+/**
+ * Creates all layered background tiles for the level.
+ * @returns {BackgroundObject[]} Configured background objects.
+ */
 function createBackgrounds() {
     const backgroundObjects = [];
     for (let i = 0; i < BACKGROUND_TILE_COUNT; i++) {
@@ -37,6 +45,10 @@ function createBackgrounds() {
     return backgroundObjects;
 }
 
+/**
+ * Creates coins at their defined level positions.
+ * @returns {Coins[]} Configured coin objects.
+ */
 function createCoins() {
     const coins = [];
     const positions = [600, 1000, 1400, 1900, 2300, 2700, 3100, 3500];
@@ -49,6 +61,10 @@ function createCoins() {
     return coins;
 }
 
+/**
+ * Creates collectible bottles at their defined level positions.
+ * @returns {BottleGround[]} Configured bottle objects.
+ */
 function createBottles() {
     const bottles = [];
     const positions = [400, 700, 1000, 1300, 1600, 1900, 2200, 2500, 2800, 3100, 3400, 3700, 4000, 4300, 4600];
@@ -61,30 +77,41 @@ function createBottles() {
     return bottles;
 }
 
+/**
+ * Creates enemy instances at the provided positions.
+ * @param {Function} EnemyType Enemy class to instantiate.
+ * @param {number[]} positions Horizontal spawn positions.
+ * @returns {MovableObject[]} Configured enemy objects.
+ */
+function createEnemiesAtPositions(EnemyType, positions) {
+    return positions.map((x) => {
+        const enemy = new EnemyType();
+        enemy.x = Math.min(x, SAFE_ENEMY_MAX_X);
+        return enemy;
+    });
+}
+
+/**
+ * Creates all level enemies, including the end boss.
+ * @returns {MovableObject[]} Configured enemy objects.
+ */
 function createEnemies() {
-    const enemies = [];
     const chickenPositions = [500, 900, 1500, 2200, 2850, 3450];
     const smallChickenPositions = [1200, 1850, 2500, 3150, 3720];
-
-    for (let x of chickenPositions) {
-        const chicken = new Chicken();
-        chicken.x = Math.min(x, SAFE_ENEMY_MAX_X);
-        enemies.push(chicken);
-    }
-
-    for (let x of smallChickenPositions) {
-        const smallChicken = new SmallChicken();
-        smallChicken.x = Math.min(x, SAFE_ENEMY_MAX_X);
-        enemies.push(smallChicken);
-    }
-
+    const enemies = [
+        ...createEnemiesAtPositions(Chicken, chickenPositions),
+        ...createEnemiesAtPositions(SmallChicken, smallChickenPositions)
+    ];
     const boss = new Endboss();
     boss.x = LEVEL_END_X + 100;
     enemies.push(boss);
-    
     return enemies;
 }
 
+/**
+ * Creates the first playable level.
+ * @returns {Level} Configured level instance.
+ */
 export default function createLevel1() {
     return new Level(
         createEnemies(),

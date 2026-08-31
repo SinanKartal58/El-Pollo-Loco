@@ -9,6 +9,9 @@ export default class Coins extends MovableObject {
     hitboxW = 60;
     hitboxH = 60;
 
+    /**
+     * Creates a coin at a random horizontal position.
+     */
     constructor() {
         super();
         this.loadImage("img_pollo_locco/img/8_coin/coin_2.png");

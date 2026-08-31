@@ -307,6 +307,10 @@ body:not(.game-start-screen) #uiButtons {
     display: none;
 }
 
+body.endboss-health-visible #muteButton {
+    top: 76px;
+}
+
 
 #startButton {
     position: absolute;
@@ -387,7 +391,6 @@ body:not(.game-start-screen) #uiButtons {
 }
 
 
-#startButton:hover,
 #playAgainButton:hover,
 #restartButton:hover,
 #backToMenuButton:hover,
@@ -396,7 +399,6 @@ body:not(.game-start-screen) #uiButtons {
     transform: scale(1.05);
 }
 
-#startButton:active,
 #restartButton:active,
 #playAgainButton:active,
 #backToMenuButton:active,

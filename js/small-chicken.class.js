@@ -14,12 +14,19 @@ export default class SmallChicken extends MovableObject {
         "img_pollo_locco/img/3_enemies_chicken/chicken_small/2_dead/dead.png"
     ]
 
+    /**
+     * Creates a small chicken with a random start position and speed.
+     */
     constructor() {
         super().loadImage("img_pollo_locco/img/3_enemies_chicken/chicken_small/1_walk/1_w.png");
         this.initialize();
         this.speed = this.speed + Math.random() * 0.25;
     }
 
+    /**
+     * Loads small-chicken images and starts its animation.
+     * @returns {void}
+     */
     initialize() {
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.DEAD_IMAGE);
@@ -29,6 +36,10 @@ export default class SmallChicken extends MovableObject {
         this.animate();
     }
 
+    /**
+     * Starts animation and movement timers for the small chicken.
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             if (this.isDead()) {
@@ -42,6 +53,10 @@ export default class SmallChicken extends MovableObject {
         }, 1000 / 60);
     }
 
+    /**
+     * Stops the small chicken after it has been defeated.
+     * @returns {void}
+     */
     kill() {
         this.health = 0;
         this.speed = 0;

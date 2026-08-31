@@ -31,6 +31,12 @@ export default class ThrowableObject extends MovableObject {
     speedY = 0;
     speed = 0;
 
+    /**
+     * Creates a projectile and immediately starts its flight.
+     * @param {number} startX Initial horizontal position.
+     * @param {number} startY Initial vertical position.
+     * @param {boolean} [throwToRight=false] Direction of the throw.
+     */
     constructor(startX, startY, throwToRight = false) {
         super();
         this.loadImages(this.IMAGES_ROTATION);
@@ -40,10 +46,18 @@ export default class ThrowableObject extends MovableObject {
         this.throw(startX, startY, throwToRight);
     }
 
+    /**
+     * Checks whether the bottle is airborne and not broken.
+     * @returns {boolean} Whether the bottle is above the ground.
+     */
     isAboveGround() {
         return !this.isBroken && this.y < this.GROUND_Y;
     }
 
+    /**
+     * Starts the bottle rotation and flight timers.
+     * @returns {void}
+     */
     animate() {
         this.rotationInterval = setInterval(() => {
             this.playAnimation(this.IMAGES_ROTATION);
@@ -75,14 +89,20 @@ export default class ThrowableObject extends MovableObject {
         this.animate();
     }
 
-    
+    /**
+     * Stops all timers used while the bottle is in flight.
+     * @returns {void}
+     */
     stopFlightIntervals() {
         if (this.gravityInterval) clearInterval(this.gravityInterval);
         if (this.rotationInterval) clearInterval(this.rotationInterval);
         if (this.moveInterval) clearInterval(this.moveInterval);
     }
 
-    
+    /**
+     * Plays the animation shown after the bottle breaks.
+     * @returns {void}
+     */
     playSplashAnimation() {
         let frame = 0;
         this.splashInterval = setInterval(() => {

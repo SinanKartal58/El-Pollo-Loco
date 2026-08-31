@@ -6,14 +6,21 @@ export default class Cloud extends MovableObject {
     width = 650;
     speed = 0.2;
 
-    
+    /**
+     * Creates a moving cloud at the supplied horizontal position.
+     * @param {string} imagePath Cloud image path.
+     * @param {number} x Horizontal position in the level.
+     */
     constructor(imagePath, x) {
         super().loadImage(imagePath);
         this.x = x;
         this.animate();
     }
 
-    
+    /**
+     * Starts the cloud movement timer.
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             this.moveLeft();

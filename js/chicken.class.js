@@ -14,14 +14,19 @@ export default class Chicken extends MovableObject {
         "img_pollo_locco/img/3_enemies_chicken/chicken_normal/2_dead/dead.png"
     ]
 
-    
+    /**
+     * Creates a chicken with a random start position and speed.
+     */
     constructor() {
         super().loadImage("img_pollo_locco/img/3_enemies_chicken/chicken_normal/1_walk/1_w.png");
         this.initialize();
         this.speed = this.speed + Math.random() * 0.25;
     }
 
-    
+    /**
+     * Loads chicken images and starts its animation.
+     * @returns {void}
+     */
     initialize() {
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.DEAD_IMAGE);
@@ -31,7 +36,10 @@ export default class Chicken extends MovableObject {
         this.animate();
     }
 
-    
+    /**
+     * Starts animation and movement timers for the chicken.
+     * @returns {void}
+     */
     animate() {
         setInterval(() => {
             if (this.isDead()) {
@@ -45,7 +53,10 @@ export default class Chicken extends MovableObject {
         }, 1000 / 60);
     }
 
-    
+    /**
+     * Stops the chicken after it has been defeated.
+     * @returns {void}
+     */
     kill() {
         this.health = 0;
         this.speed = 0;

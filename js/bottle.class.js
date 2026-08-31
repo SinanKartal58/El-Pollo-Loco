@@ -10,7 +10,11 @@ export default class BottleGround extends DrawableObject {
     hitboxW = 34;
     hitboxH = 65;
 
-    
+    /**
+     * Creates a collectible salsa bottle.
+     * @param {number} [x=100] Horizontal position in the level.
+     * @param {number} [y=350] Vertical position in the level.
+     */
     constructor(x = 100, y = 350) {
         super();
         this.loadImage("img_pollo_locco/img/6_salsa_bottle/1_salsa_bottle_on_ground.png");

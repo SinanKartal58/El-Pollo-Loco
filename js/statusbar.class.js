@@ -40,7 +40,10 @@ export default class StatusBar extends DrawableObject {
 
     percentage = 100;
 
-    
+    /**
+     * Creates a status bar for the supplied game resource type.
+     * @param {string} type Status bar type.
+     */
     constructor(type) {
         super();
         this.width = 200;
@@ -56,6 +59,11 @@ export default class StatusBar extends DrawableObject {
         this.setPercentage(0);
     }
 
+    /**
+     * Applies position and images for a status bar type.
+     * @param {string} type Status bar type.
+     * @returns {void}
+     */
     initialize(type) {
         const config = {
             health:  { y: 0,   images: this.IMAGES_HEALTH },
@@ -69,14 +77,21 @@ export default class StatusBar extends DrawableObject {
         this.IMAGES = images;
     }
 
-    
+    /**
+     * Sets the displayed percentage and corresponding image.
+     * @param {number} percentage Value between 0 and 100.
+     * @returns {void}
+     */
     setPercentage(percentage) {
         this.percentage = percentage;
         let path = this.IMAGES[this.resolveImageIndex()];
         this.img = this.imgStore[path];
     }
 
-    
+    /**
+     * Gets the image index matching the current percentage.
+     * @returns {number} Status bar image index.
+     */
     resolveImageIndex() {
         return Math.ceil(this.percentage / 20);
     }

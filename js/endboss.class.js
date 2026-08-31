@@ -37,7 +37,10 @@ export default class Endboss extends MovableObject {
     hasBeenTriggered = false
     knockbackActive = false
 
-    
+    /**
+     * Creates the end boss at its supplied horizontal position.
+     * @param {number} x Initial horizontal position.
+     */
     constructor(x) {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
@@ -47,13 +50,19 @@ export default class Endboss extends MovableObject {
         this.x = x;
         this.animate();
     }
-
+    /**
+     * Starts the end boss sprite and movement timers.
+     * @returns {void}
+     */
     animate() {
         this.startSpriteInterval();
         this.startMovementInterval();
     }
 
-    
+    /**
+     * Starts the end boss sprite update timer.
+     * @returns {void}
+     */
     startSpriteInterval() {
         this.currentAnimationState = 'walking';
 
@@ -71,6 +80,12 @@ export default class Endboss extends MovableObject {
         }, 100);
     }
 
+    /**
+     * Applies the image sequence for a new or existing animation state.
+     * @param {string} nextState State to display.
+     * @param {string[]} images Image paths for the state.
+     * @returns {void}
+     */
     setAnimationState(nextState, images) {
         if (this.currentAnimationState !== nextState) {
             this.currentImage = 0;
@@ -79,7 +94,10 @@ export default class Endboss extends MovableObject {
         this.playAnimation(images);
     }
 
-    
+    /**
+     * Starts the end boss movement timer.
+     * @returns {void}
+     */
     startMovementInterval() {
         setInterval(() => {
             if (!this.world || this.isDead() || this.knockbackActive) return;
@@ -92,36 +110,56 @@ export default class Endboss extends MovableObject {
         }, 1000 / 60);
     }
 
-    
+    /**
+     * Applies incoming damage and starts the knockback animation if needed.
+     * @param {number} damage Damage to apply.
+     * @returns {void}
+     */
     hit(damage) {
         super.hit(damage);
         if (!this.isDead()) this.startKnockback();
     }
 
-    
+    /**
+     * Starts the end boss knockback animation.
+     * @returns {void}
+     */
     startKnockback() {
         if (this.knockbackActive) return;
         this.knockbackActive = true;
-
-        const startY  = this.y;
-        const startX  = this.x;
-        const arcHeight  = 70;
-        const driftRight = 55;
-        const duration   = 500;
-        const t0 = Date.now();
-
+        const knockback = this.createKnockbackState();
         const interval = setInterval(() => {
-            const t = (Date.now() - t0) / duration;
-            if (t >= 1) {
-                this.y = startY;
-                this.x = startX + driftRight;
-                this.knockbackActive = false;
-                clearInterval(interval);
-                return;
-            }
-            this.y = startY - arcHeight * 4 * t * (1 - t);
-            this.x = startX + driftRight * t;
+            if (this.updateKnockback(knockback)) clearInterval(interval);
         }, 1000 / 60);
+    }
+
+    /**
+     * Creates the fixed values required for one knockback animation.
+     * @returns {{startY: number, startX: number, arcHeight: number, driftRight: number, duration: number, startedAt: number}} Knockback state.
+     */
+    createKnockbackState() {
+        return {
+            startY: this.y, startX: this.x, arcHeight: 70,
+            driftRight: 55, duration: 500, startedAt: Date.now()
+        };
+    }
+
+    /**
+     * Advances the end boss by one frame of the knockback animation.
+     * @param {object} knockback Values created for the active animation.
+     * @returns {boolean} Whether the animation has finished.
+     */
+    updateKnockback(knockback) {
+        const progress = (Date.now() - knockback.startedAt) / knockback.duration;
+        if (progress >= 1) {
+            this.y = knockback.startY;
+            this.x = knockback.startX + knockback.driftRight;
+            this.knockbackActive = false;
+            return true;
+        }
+        this.y = knockback.startY - knockback.arcHeight * 4 * progress * (1 - progress);
+        this.x = knockback.startX + knockback.driftRight * progress;
+        return false;
     }
 }
 

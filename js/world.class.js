@@ -22,7 +22,12 @@ export default class World {
     stopped = false;
     sounds = null;
 
-    
+    /**
+     * Creates the game world with its canvas, input state, and level.
+     * @param {HTMLCanvasElement} canvas Canvas used to render the game.
+     * @param {Keyboard} keyboard Object containing the current input state.
+     * @param {Level} level Level to display and update.
+     */
     constructor(canvas, keyboard, level) {
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
@@ -36,38 +41,59 @@ export default class World {
         this.draw();
     }
 
-    
+    /**
+     * Connects game objects to their containing world.
+     * @returns {void}
+     */
     setWorld() {
         this.character.world = this;
         this.activeLevel.enemies.forEach(enemy => { enemy.world = this; });
     }
 
     
+    /**
+     * Handles a collision between the character and an enemy.
+     * @param {MovableObject} enemy Enemy involved in the collision.
+     * @returns {void}
+     */
     handleEnemyCollision(enemy) {
         if (enemy.isDead() || !this.isEnemyHittingCharacter(enemy)) return;
         if (this.character.isHurt() && !(enemy instanceof Endboss)) return;
-
-        if (enemy instanceof Endboss) {
-
-        }
-
         if (this.isStompingEnemy(enemy)) {
-            enemy.kill();
-            this.playSound('chickenHit');
-            this.character.y = GROUND_Y - this.character.height - 20;
-            this.character.jump();
-            this.removeEnemy(enemy);
+            this.handleStomp(enemy);
             return;
         }
-
-        if (!this.isCharacterInAir()) {
-            this.character.hit(20);
-            this.statusBarHealth.setPercentage(this.character.health);
-            this.playSound('hurt');
-        }
+        this.handleEnemyDamage();
     }
 
-    
+    /**
+     * Removes an enemy after the character jumps on it.
+     * @param {MovableObject} enemy Enemy defeated by the character.
+     * @returns {void}
+     */
+    handleStomp(enemy) {
+        enemy.kill();
+        this.playSound('chickenHit');
+        this.character.y = GROUND_Y - this.character.height - 20;
+        this.character.jump();
+        this.removeEnemy(enemy);
+    }
+
+    /**
+     * Applies contact damage while the character is on the ground.
+     * @returns {void}
+     */
+    handleEnemyDamage() {
+        if (this.isCharacterInAir()) return;
+        this.character.hit(20);
+        this.statusBarHealth.setPercentage(this.character.health);
+        this.playSound('hurt');
+    }
+
+    /**
+     * Starts the recurring collision checks.
+     * @returns {void}
+     */
     checkCollisions() {
         setInterval(() => {
             this.isCharColliding(this.activeLevel.enemies, (enemy) => this.handleEnemyCollision(enemy));
@@ -75,10 +101,13 @@ export default class World {
             this.isCharColliding(this.activeLevel.bottles, (bottle, index) => this.updateBottles(index));
             this.checkThrowableBottleCollisions();
             this.checkIfEndbossDead();
-            this.updateWalkingSound();
         }, 1000 / 60);
     }
-    
+    /**
+     * Handles one flying bottle touching the ground or an enemy.
+     * @param {ThrowableObject} bottle Flying bottle to check.
+     * @returns {void}
+     */
     checkBottleImpact(bottle) {
         if (bottle.isBroken) return;
         if (this.isBottleHittingGround(bottle)) {
@@ -89,7 +118,10 @@ export default class World {
         if (hitEnemy) this.applyBottleHit(hitEnemy, bottle);
     }
 
-    
+    /**
+     * Removes finished bottles and checks active bottles for impacts.
+     * @returns {void}
+     */
     checkThrowableBottleCollisions() {
         for (let i = this.activeLevel.throwableBottles.length - 1; i >= 0; i--) {
             if (this.activeLevel.throwableBottles[i].markedForRemoval) {
@@ -99,14 +131,23 @@ export default class World {
         this.activeLevel.throwableBottles.forEach(bottle => this.checkBottleImpact(bottle));
     }
 
-    
+    /**
+     * Finds the first living enemy hit by a bottle.
+     * @param {ThrowableObject} bottle Bottle to test.
+     * @returns {MovableObject|undefined} Hit enemy, if present.
+     */
     getBottleHitEnemy(bottle) {
         return this.activeLevel.enemies.find(
             enemy => !enemy.isDead() && bottle.isColliding(enemy)
         );
     }
 
-    
+    /**
+     * Applies the result of a bottle hit to an enemy.
+     * @param {MovableObject} enemy Enemy struck by the bottle.
+     * @param {ThrowableObject} bottle Bottle that caused the hit.
+     * @returns {void}
+     */
     applyBottleHit(enemy, bottle) {
         bottle.break();
         if (enemy instanceof Endboss) {
@@ -119,12 +160,21 @@ export default class World {
         }
     }
 
-    
+    /**
+     * Checks whether a bottle has reached the ground while descending.
+     * @param {ThrowableObject} bottle Bottle to test.
+     * @returns {boolean} Whether the bottle touched the ground.
+     */
     isBottleHittingGround(bottle) {
         return bottle.speedY <= 0 && bottle.y >= bottle.GROUND_Y;
     }
 
-    
+    /**
+     * Removes a collected coin and updates its status bar.
+     * @param {number} index Index of the collected coin.
+     * @param {number} amount Percentage gained from the coin.
+     * @returns {void}
+     */
     updateCoins(index, amount) {
         this.activeLevel.coins.splice(index, 1);
         this.coinPercentage = Math.min(this.coinPercentage + amount, 100);
@@ -132,7 +182,11 @@ export default class World {
         this.playSound('coin');
     }
 
-    
+    /**
+     * Collects a bottle when the maximum capacity has not been reached.
+     * @param {number} index Index of the collected bottle.
+     * @returns {void}
+     */
     updateBottles(index) {
         if (this.character.bottleCount >= this.MAX_BOTTLES) return;
         this.activeLevel.bottles.splice(index, 1);
@@ -141,12 +195,19 @@ export default class World {
         this.playSound('bottle');
     }
 
-    
+    /**
+     * Checks whether the character is airborne.
+     * @returns {boolean} Whether the character is in the air.
+     */
     isCharacterInAir() {
         return this.character.isAboveGround() || this.character.speedY > 0;
     }
 
-    
+    /**
+     * Checks whether the character horizontally overlaps an enemy.
+     * @param {MovableObject} enemy Enemy to test.
+     * @returns {boolean} Whether the hitboxes overlap.
+     */
     isEnemyHittingCharacter(enemy) {
         const charLeft  = this.character.hbLeft;
         const charRight = charLeft + this.character.hbWidth;
@@ -155,7 +216,11 @@ export default class World {
         return charRight > enemyLeft && charLeft < enemyRight;
     }
 
-    
+    /**
+     * Checks whether the character is descending onto an enemy.
+     * @param {MovableObject} enemy Enemy to test.
+     * @returns {boolean} Whether the character stomps the enemy.
+     */
     isStompingEnemy(enemy) {
         const characterBottom = this.character.hbTop + this.character.hbHeight;
         const enemyTopHitZone = enemy.hbTop + enemy.hbHeight * 0.4;
@@ -165,7 +230,11 @@ export default class World {
             characterBottom <= enemyTopHitZone;
     }
 
-    
+    /**
+     * Delays removal of a defeated enemy for its death animation.
+     * @param {MovableObject} enemy Enemy to remove.
+     * @returns {void}
+     */
     removeEnemy(enemy) {
         setTimeout(() => {
             const idx = this.activeLevel.enemies.indexOf(enemy);
@@ -173,14 +242,22 @@ export default class World {
         }, 2000);
     }
 
-    
+    /**
+     * Runs a callback for every object colliding with the character.
+     * @param {MovableObject[]} array Objects to check.
+     * @param {Function} callback Function called for a collision.
+     * @returns {void}
+     */
     isCharColliding(array, callback) {
         for (let i = array.length - 1; i >= 0; i--) {
             if (this.character.isColliding(array[i])) callback(array[i], i);
         }
     }
 
-    
+    /**
+     * Draws all game objects in their world layer order.
+     * @returns {void}
+     */
     drawWorldObjects() {
         this.addObjectsToMap(this.activeLevel.backgroundObjects);
         this.addObjectsToMap(this.activeLevel.enemies);
@@ -191,18 +268,26 @@ export default class World {
         this.addToMap(this.character);
     }
 
-    
+    /**
+     * Draws the player status bars and the boss bar when active.
+     * @returns {void}
+     */
     drawHUD() {
         this.addToMap(this.statusBarHealth);
         this.addToMap(this.statusBarCoins);
         this.addToMap(this.statusBarBottles);
         const endboss = this.activeLevel.enemies.find(e => e instanceof Endboss);
+        const isEndbossHealthVisible = Boolean(endboss && endboss.hasBeenTriggered);
+        document.body.classList.toggle('endboss-health-visible', isEndbossHealthVisible);
         if (endboss && endboss.hasBeenTriggered) {
             this.addToMap(this.statusBarEndboss);
         }
     }
 
-    
+    /**
+     * Renders one animation frame and schedules the next frame.
+     * @returns {void}
+     */
     draw() {
         if (this.stopped) return;
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -213,7 +298,11 @@ export default class World {
         this.animationFrameId = requestAnimationFrame(this.draw.bind(this));
     }
 
-    
+    /**
+     * Draws every object of a game-object collection.
+     * @param {DrawableObject[]} array Objects to draw.
+     * @returns {void}
+     */
     addObjectsToMap(array) {
         try {
             array.forEach(obj => this.addToMap(obj));
@@ -222,14 +311,22 @@ export default class World {
         }
     }
 
-    
+    /**
+     * Draws one object, mirroring it when it faces left.
+     * @param {DrawableObject} obj Object to draw.
+     * @returns {void}
+     */
     addToMap(obj) {
         if (obj.otherDirection) this.flipImage(obj);
         obj.draw(this.ctx);
         if (obj.otherDirection) this.flipImageBack(obj);
     }
 
-    
+    /**
+     * Mirrors the canvas before drawing a left-facing object.
+     * @param {DrawableObject} obj Object being mirrored.
+     * @returns {void}
+     */
     flipImage(obj) {
         this.ctx.save();
         this.ctx.translate(obj.width, 0);
@@ -237,13 +334,20 @@ export default class World {
         obj.x = obj.x * -1;
     }
 
-    
+    /**
+     * Restores the canvas after drawing a left-facing object.
+     * @param {DrawableObject} obj Object that was mirrored.
+     * @returns {void}
+     */
     flipImageBack(obj) {
         obj.x = obj.x * -1;
         this.ctx.restore();
     }
 
-    
+    /**
+     * Stops the render frame and all active gameplay intervals.
+     * @returns {void}
+     */
     stopGameLoop() {
         this.stopped = true;
         if (this.animationFrameId) {
@@ -253,7 +357,10 @@ export default class World {
         for (let i = 1; i < 9999; i++) window.clearInterval(i);
     }
 
-    
+    /**
+     * Displays the game-over screen once.
+     * @returns {void}
+     */
     showGameOverScreen() {
         if (this.gameOverShown) return;
         this.gameOverShown = true;
@@ -265,7 +372,10 @@ export default class World {
         document.getElementById('gameOverScreen').classList.remove('d-none');
     }
 
-    
+    /**
+     * Schedules the victory screen once the end boss has died.
+     * @returns {void}
+     */
     checkIfEndbossDead() {
         const endboss = this.activeLevel.enemies.find(e => e instanceof Endboss);
         if (!endboss || endboss.health > 0 || endboss.deathTriggered) return;
@@ -273,7 +383,11 @@ export default class World {
         setTimeout(() => { if (window.showWinScreen) window.showWinScreen(); }, 1500);
     }
 
-    
+    /**
+     * Plays a configured game sound by name.
+     * @param {string} name Name of the sound to play.
+     * @returns {void}
+     */
     playSound(name) {
         if (!this.sounds || !this.sounds[name]) return;
         const sound = this.sounds[name];
@@ -281,7 +395,10 @@ export default class World {
         sound.play().catch(() => {});
     }
 
-    
+    /**
+     * Starts or stops the walking sound based on character movement.
+     * @returns {void}
+     */
     updateWalkingSound() {
         if (!this.sounds || !this.sounds.walking) return;
         const walking = this.sounds.walking;

@@ -4,6 +4,10 @@
     RIGHT_ARROW = false;
     KEY_D = false;
 
+    /**
+     * Releases every tracked game control key.
+     * @returns {void}
+     */
     reset() {
         this.SPACE = false;
         this.LEFT_ARROW = false;
