@@ -102,13 +102,24 @@ export default class Endboss extends MovableObject {
         setInterval(() => {
             if (!this.world || this.isDead() || this.knockbackActive) return;
             const bossTriggerX = this.world.activeLevel?.level_end_x ? this.world.activeLevel.level_end_x - 480 : 5200;
-            const distanceToCharacter = this.world.character.x - this.x;
-            const reachedBossZone = this.world.character.x >= bossTriggerX;
-
-            if (reachedBossZone) this.hasBeenTriggered = true;
-            if (this.hasBeenTriggered && reachedBossZone) this.moveLeft();
+            if (!this.hasBeenTriggered && this.world.character.x >= bossTriggerX) {
+                this.hasBeenTriggered = true;
+            }
+            if (this.hasBeenTriggered) this.chaseCharacter();
         }, 1000 / 60);
     }
+
+    /**
+     * Moves the end boss toward the character's current position.
+     * @returns {void}
+     */
+    chaseCharacter() {
+        const distanceToCharacter = this.world.character.x - this.x;
+        if (Math.abs(distanceToCharacter) < 10) return;
+        if (distanceToCharacter < 0) this.moveLeft();
+        else this.moveRight();
+    }
+
 
     /**
      * Applies incoming damage and starts the knockback animation if needed.

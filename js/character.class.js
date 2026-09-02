@@ -264,7 +264,7 @@ export default class Character extends MovableObject {
      */
     calculateThrowPosition(throwToRight) {
         return {
-            x: throwToRight ? this.x + this.width + 30 : this.x - 60,
+            x: throwToRight ? this.x + this.width - 20 : this.x - 10,
             y: this.y + 100
         };
     }
@@ -291,7 +291,7 @@ export default class Character extends MovableObject {
         const throwToRight = !this.otherDirection;
         const pos = this.calculateThrowPosition(throwToRight);
         const bottle = new SalsaBottle(pos.x, pos.y, throwToRight);
-        bottle.speedY = -11;
+        bottle.speedY = -7;
         bottle.speedX = throwToRight ? 12 : -12;
         return bottle;
     }
