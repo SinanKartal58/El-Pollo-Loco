@@ -866,3 +866,51 @@ footer {
     }
 }
 
+
+/* Short viewports (e.g. landscape phones) are missed by the width-only breakpoints above. */
+@media (max-height: 500px) {
+    h1 {
+        display: none;
+    }
+
+    #gameContainer {
+        width: min(100vw - 16px, calc((100dvh - 16px) * 1.5));
+        max-height: calc(100dvh - 16px);
+    }
+
+    #gameOverActions,
+    #winScreenActions {
+        gap: 10px;
+    }
+
+    #restartButton,
+    #playAgainButton,
+    #backToMenuButton,
+    #backToStartButton {
+        min-width: 150px;
+        padding: 10px 20px;
+        font-size: 16px;
+    }
+
+    #gameOverActions {
+        bottom: 10px;
+        max-width: calc(100% - 20px);
+    }
+
+    #win-screen {
+        gap: 10px;
+        padding: 10px;
+    }
+
+    #win-screen .win-title {
+        font-size: clamp(2rem, 10vw, 3rem);
+    }
+}
+
+/* The game already fills as much of the screen as possible on touch devices. */
+@media (pointer: coarse) {
+    #fullscreen-btn {
+        display: none !important;
+    }
+}
+
