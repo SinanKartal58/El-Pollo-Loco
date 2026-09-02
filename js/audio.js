@@ -4,27 +4,14 @@
 import BurstSound from './burst-sound.class.js';
 import LoopSound from './loop-sound.class.js';
 import PatternLoopSound from './pattern-loop-sound.class.js';
+import { isAudioMuted, setAudioMuted } from './audio-utils.js';
 
 const MUTE_STORAGE_KEY = 'elPolloMuted';
 
-let muted = false;
-
 try {
-    muted = localStorage.getItem(MUTE_STORAGE_KEY) === 'true';
+    setAudioMuted(localStorage.getItem(MUTE_STORAGE_KEY) === 'true');
 } catch {
-    muted = false;
-}
-
-/**
- * Schedules a tone pattern when audio is not muted.
- * @param {Array<object>} pattern Tone definitions to play.
- * @returns {void}
- */
-function playSoundIfNotMuted(pattern) {
-    if (muted) return;
-    pattern.forEach((step) => {
-        playTone(step.freq, step.duration, step.type, step.volume, step.delay);
-    });
+    setAudioMuted(false);
 }
 
 export const backgroundMusic = new PatternLoopSound([
@@ -73,12 +60,12 @@ export const chickenHitSound = new BurstSound([
 
 export function applyMuteState() {
 	try {
-		muted = localStorage.getItem(MUTE_STORAGE_KEY) === 'true';
+		setAudioMuted(localStorage.getItem(MUTE_STORAGE_KEY) === 'true');
 	} catch {
-		muted = false;
+		setAudioMuted(false);
 	}
 
-	if (muted) {
+	if (isAudioMuted()) {
 		backgroundMusic.pause();
 		walkingSound.pause();
 	}
@@ -89,23 +76,23 @@ export function playBackgroundMusic() {
 }
 
 export function toggleMute() {
-	muted = !muted;
+	setAudioMuted(!isAudioMuted());
 
 	try {
-		localStorage.setItem(MUTE_STORAGE_KEY, String(muted));
+		localStorage.setItem(MUTE_STORAGE_KEY, String(isAudioMuted()));
 	} catch {
 	}
 
-	if (muted) {
+	if (isAudioMuted()) {
 		backgroundMusic.pause();
 		walkingSound.pause();
 	}
 
-	return muted;
+	return isAudioMuted();
 }
 
 export function isMuted() {
-	return muted;
+	return isAudioMuted();
 }
 
 

@@ -2,6 +2,24 @@
  * Shared Web Audio helpers used by the game sound system.
  */
 let audioContext = null;
+let muted = false;
+
+/**
+ * Checks whether game audio is currently muted.
+ * @returns {boolean} Whether audio is muted.
+ */
+export function isAudioMuted() {
+    return muted;
+}
+
+/**
+ * Sets the shared mute state used by all generated tones.
+ * @param {boolean} value Whether audio should be muted.
+ * @returns {void}
+ */
+export function setAudioMuted(value) {
+    muted = value;
+}
 
 /**
  * Gets or creates the browser audio context.
@@ -39,6 +57,7 @@ export function ensureAudioContextReady() {
  * @returns {void}
  */
 export function playTone(frequency, duration = 0.08, type = 'sine', volume = 0.05, delay = 0) {
+    if (muted) return;
     const ctx = getAudioContext();
     if (!ctx || !ensureAudioContextReady()) return;
 

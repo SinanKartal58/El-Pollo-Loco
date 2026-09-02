@@ -1,4 +1,4 @@
-import { ensureAudioContextReady, getAudioContext } from './audio-utils.js';
+import { ensureAudioContextReady, getAudioContext, isAudioMuted } from './audio-utils.js';
 
 /**
  * Represents a continuous tone, used for looping effects.
@@ -25,7 +25,8 @@ export default class LoopSound {
      * @returns {Promise<void>} A resolved promise after starting playback.
      */
     play() {
-        if (!this.paused) return Promise.resolve();
+        if (!this.paused || isAudioMuted()) return Promise.resolve();
+
 
         const ctx = getAudioContext();
         if (!ctx || !ensureAudioContextReady()) return Promise.resolve();
