@@ -58,7 +58,7 @@ export default class World {
      */
     handleEnemyCollision(enemy) {
         if (enemy.isDead() || !this.isEnemyHittingCharacter(enemy)) return;
-        if (this.character.isHurt() && !(enemy instanceof Endboss)) return;
+        if (this.character.isHurt()) return;
         if (this.isStompingEnemy(enemy)) {
             this.handleStomp(enemy);
             return;

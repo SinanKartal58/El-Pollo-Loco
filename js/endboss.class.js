@@ -18,6 +18,16 @@ export default class Endboss extends MovableObject {
         "img_pollo_locco/img/4_enemie_boss_chicken/2_alert/G11.png",
         "img_pollo_locco/img/4_enemie_boss_chicken/2_alert/G12.png"
     ]
+    IMAGES_ATTACK = [
+        "img_pollo_locco/img/4_enemie_boss_chicken/3_attack/G13.png",
+        "img_pollo_locco/img/4_enemie_boss_chicken/3_attack/G14.png",
+        "img_pollo_locco/img/4_enemie_boss_chicken/3_attack/G15.png",
+        "img_pollo_locco/img/4_enemie_boss_chicken/3_attack/G16.png",
+        "img_pollo_locco/img/4_enemie_boss_chicken/3_attack/G17.png",
+        "img_pollo_locco/img/4_enemie_boss_chicken/3_attack/G18.png",
+        "img_pollo_locco/img/4_enemie_boss_chicken/3_attack/G19.png",
+        "img_pollo_locco/img/4_enemie_boss_chicken/3_attack/G20.png"
+    ]
     IMAGES_HURT = [
         "img_pollo_locco/img/4_enemie_boss_chicken/4_hurt/G21.png",
         "img_pollo_locco/img/4_enemie_boss_chicken/4_hurt/G22.png",
@@ -36,6 +46,8 @@ export default class Endboss extends MovableObject {
     speed = 3
     hasBeenTriggered = false
     knockbackActive = false
+    isAttacking = false
+    ATTACK_DISTANCE = 190
 
     /**
      * Creates the end boss at its supplied horizontal position.
@@ -45,6 +57,7 @@ export default class Endboss extends MovableObject {
         super().loadImage(this.IMAGES_WALKING[0]);
         this.loadImages(this.IMAGES_WALKING);
         this.loadImages(this.IMAGES_ALERT);
+        this.loadImages(this.IMAGES_ATTACK);
         this.loadImages(this.IMAGES_HURT);
         this.loadImages(this.IMAGES_DEAD);
         this.x = x;
@@ -65,19 +78,22 @@ export default class Endboss extends MovableObject {
      */
     startSpriteInterval() {
         this.currentAnimationState = 'walking';
+        setInterval(() => this.updateSpriteAnimation(), 100);
+    }
 
-        setInterval(() => {
-            if (this.isDead()) {
-                this.setAnimationState('dead', this.IMAGES_DEAD);
-            } else if (this.isHurt()) {
-                this.setAnimationState('hurt', this.IMAGES_HURT);
-            } else if (this.hasBeenTriggered) {
-                const alertDone = this.currentImage >= this.IMAGES_ALERT.length;
-                this.setAnimationState(alertDone ? 'walking' : 'alert', alertDone ? this.IMAGES_WALKING : this.IMAGES_ALERT);
-            } else {
-                this.setAnimationState('walking', this.IMAGES_WALKING);
-            }
-        }, 100);
+    /**
+     * Selects and displays the end boss animation for the current state.
+     * @returns {void}
+     */
+    updateSpriteAnimation() {
+        if (this.isDead()) return this.setAnimationState('dead', this.IMAGES_DEAD);
+        if (this.isHurt()) return this.setAnimationState('hurt', this.IMAGES_HURT);
+        if (this.isAttacking) return this.setAnimationState('attack', this.IMAGES_ATTACK);
+        if (!this.hasBeenTriggered) return this.setAnimationState('walking', this.IMAGES_WALKING);
+        const alertDone = this.currentImage >= this.IMAGES_ALERT.length;
+        const state = alertDone ? 'walking' : 'alert';
+        const images = alertDone ? this.IMAGES_WALKING : this.IMAGES_ALERT;
+        this.setAnimationState(state, images);
     }
 
     /**
@@ -115,7 +131,8 @@ export default class Endboss extends MovableObject {
      */
     chaseCharacter() {
         const distanceToCharacter = this.world.character.x - this.x;
-        if (Math.abs(distanceToCharacter) < 10) return;
+        this.isAttacking = Math.abs(distanceToCharacter) <= this.ATTACK_DISTANCE;
+        if (this.isAttacking) return;
         if (distanceToCharacter < 0) this.moveLeft();
         else this.moveRight();
     }

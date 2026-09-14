@@ -20,7 +20,7 @@ export default class Character extends MovableObject {
     health = 100;
     bottleCount = 0;
     lastThrowTime = 0;
-    THROW_COOLDOWN = 100;
+    THROW_COOLDOWN = 600;
     throwKeyPressed = false;
     IMAGES_WALKING = [
         "img_pollo_locco/img/2_character_pepe/2_walk/W-21.png",
@@ -159,8 +159,8 @@ export default class Character extends MovableObject {
         if (this.isDead()) {
             return this.IMAGES_DEAD;
         }
-        if (this.isAboveGround()) return this.IMAGES_JUMPING;
         if (this.isHurt()) return this.IMAGES_HURT;
+        if (this.isAboveGround()) return this.IMAGES_JUMPING;
         if (this.isWalking()) return this.IMAGES_WALKING;
         return isLongIdle() ? this.IMAGES_IDLE : this.IMAGES_IDLE_SHORT;
     }
