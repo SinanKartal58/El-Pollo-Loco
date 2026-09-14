@@ -60,7 +60,20 @@ export function playTone(frequency, duration = 0.08, type = 'sine', volume = 0.0
     if (muted) return;
     const ctx = getAudioContext();
     if (!ctx || !ensureAudioContextReady()) return;
+    scheduleTone(ctx, frequency, duration, type, volume, delay);
+}
 
+/**
+ * Configures and schedules an oscillator tone.
+ * @param {AudioContext} ctx Active audio context.
+ * @param {number} frequency Tone frequency in hertz.
+ * @param {number} duration Tone duration in seconds.
+ * @param {OscillatorType} type Oscillator waveform.
+ * @param {number} volume Tone volume.
+ * @param {number} delay Start delay in seconds.
+ * @returns {void}
+ */
+function scheduleTone(ctx, frequency, duration, type, volume, delay) {
     const startAt = ctx.currentTime + delay;
     const endAt = startAt + duration;
     const osc = ctx.createOscillator();

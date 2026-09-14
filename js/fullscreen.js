@@ -55,12 +55,7 @@ export async function toggleFullscreenMode() {
     if (!gameContainer) return;
 
     if (isNativeFullscreenActive()) {
-        if (document.exitFullscreen) {
-            await document.exitFullscreen().catch(() => {});
-        } else if (document.webkitExitFullscreen) {
-            document.webkitExitFullscreen();
-        }
-        exitImmersiveMode();
+        await exitNativeFullscreen();
         return;
     }
 
@@ -69,14 +64,29 @@ export async function toggleFullscreenMode() {
         return;
     }
 
+    await requestNativeFullscreen(gameContainer);
+}
+
+/**
+ * Exits browser fullscreen and restores the normal layout.
+ * @returns {Promise<void>} Resolves after fullscreen is closed.
+ */
+async function exitNativeFullscreen() {
+    if (document.exitFullscreen) await document.exitFullscreen().catch(() => {});
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    exitImmersiveMode();
+}
+
+/**
+ * Requests browser fullscreen or uses the immersive fallback.
+ * @param {HTMLElement} gameContainer Game container to enlarge.
+ * @returns {Promise<void>} Resolves after the request is handled.
+ */
+async function requestNativeFullscreen(gameContainer) {
     try {
-        if (gameContainer.requestFullscreen) {
-            await gameContainer.requestFullscreen();
-        } else if (gameContainer.webkitRequestFullscreen) {
-            gameContainer.webkitRequestFullscreen();
-        } else {
-            enterImmersiveMode();
-        }
+        if (gameContainer.requestFullscreen) await gameContainer.requestFullscreen();
+        else if (gameContainer.webkitRequestFullscreen) gameContainer.webkitRequestFullscreen();
+        else enterImmersiveMode();
     } catch {
         enterImmersiveMode();
     }

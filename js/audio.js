@@ -58,6 +58,10 @@ export const chickenHitSound = new BurstSound([
     { freq: 260, duration: 0.09, type: 'square', volume: 0.04, delay: 0.08 }
 ]);
 
+/**
+ * Applies the persisted mute preference and stops active loops when muted.
+ * @returns {void}
+ */
 export function applyMuteState() {
 	try {
 		setAudioMuted(localStorage.getItem(MUTE_STORAGE_KEY) === 'true');
@@ -71,10 +75,18 @@ export function applyMuteState() {
 	}
 }
 
+/**
+ * Starts the background music loop.
+ * @returns {Promise<void>} Resolves after music playback is scheduled.
+ */
 export function playBackgroundMusic() {
 	return backgroundMusic.play();
 }
 
+/**
+ * Toggles the shared mute state and persists it in local storage.
+ * @returns {boolean} The resulting mute state.
+ */
 export function toggleMute() {
 	setAudioMuted(!isAudioMuted());
 
@@ -91,6 +103,10 @@ export function toggleMute() {
 	return isAudioMuted();
 }
 
+/**
+ * Returns the current game mute state.
+ * @returns {boolean} Whether all generated game audio is muted.
+ */
 export function isMuted() {
 	return isAudioMuted();
 }
