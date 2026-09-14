@@ -1,4 +1,7 @@
-﻿export default class Keyboard {
+﻿/**
+ * Stores the current state of the game control keys.
+ */
+export default class Keyboard {
     SPACE = false;
     LEFT_ARROW = false;
     RIGHT_ARROW = false;

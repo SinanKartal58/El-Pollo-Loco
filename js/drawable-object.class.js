@@ -1,4 +1,6 @@
-﻿
+﻿/**
+ * Base class for drawable game objects with image and hitbox support.
+ */
 export default class DrawableObject {
     x = 120;
     y = 250;
@@ -15,12 +17,16 @@ export default class DrawableObject {
     hitboxH = null;
 
     
-    get hbLeft()   { return this.x + this.hitboxX; }
-    
-    get hbTop()    { return this.y + this.hitboxY; }
-    
-    get hbWidth()  { return this.hitboxW ?? (this.width  - this.hitboxX); }
-    
+    /** @returns {number} Left edge of the hitbox. */
+    get hbLeft() { return this.x + this.hitboxX; }
+
+    /** @returns {number} Top edge of the hitbox. */
+    get hbTop() { return this.y + this.hitboxY; }
+
+    /** @returns {number} Width of the hitbox. */
+    get hbWidth() { return this.hitboxW ?? (this.width - this.hitboxX); }
+
+    /** @returns {number} Height of the hitbox. */
     get hbHeight() { return this.hitboxH ?? (this.height - this.hitboxY); }
 
     /**
