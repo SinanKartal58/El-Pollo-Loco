@@ -92,7 +92,8 @@ export function toggleMute() {
 
 	try {
 		localStorage.setItem(MUTE_STORAGE_KEY, String(isAudioMuted()));
-	} catch {
+	} catch (error) {
+		console.warn('Unable to persist mute state:', error);
 	}
 
 	if (isAudioMuted()) {

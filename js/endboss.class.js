@@ -43,11 +43,12 @@ export default class Endboss extends MovableObject {
     y = 130
     hitboxW = 280;
     hitboxH = 280;
-    speed = 3
+    speed = 4
+    health = 180
     hasBeenTriggered = false
     knockbackActive = false
     isAttacking = false
-    ATTACK_DISTANCE = 190
+    ATTACK_DISTANCE = 170
 
     /**
      * Creates the end boss at its supplied horizontal position.

@@ -151,7 +151,7 @@ export default class World {
     applyBottleHit(enemy, bottle) {
         bottle.break();
         if (enemy instanceof Endboss) {
-            enemy.hit(13);
+            enemy.hit(22);
             this.statusBarEndboss.setPercentage(enemy.health);
         } else {
             enemy.kill();

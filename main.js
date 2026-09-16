@@ -116,7 +116,7 @@ function showWinScreen() {
     lostSound.pause();
     lostSound.currentTime = 0;
     winSound.currentTime = 0;
-    winSound.play().catch(() => {});
+    winSound.play().catch((error) => console.warn('Unable to play win sound:', error));
     hasGameStarted = false;
     document.getElementById('gameOverScreen').classList.add('d-none');
     document.getElementById('win-screen').classList.remove('d-none');
@@ -137,7 +137,7 @@ function showGameOverScreen() {
     winSound.pause();
     winSound.currentTime = 0;
     lostSound.currentTime = 0;
-    lostSound.play().catch(() => {});
+    lostSound.play().catch((error) => console.warn('Unable to play lose sound:', error));
     hasGameStarted = false;
     document.getElementById('win-screen').classList.add('d-none');
     gameOverScreen.classList.remove('d-none');
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     if (fullscreenBtn) {
         fullscreenBtn.addEventListener('click', () => {
-            toggleFullscreenMode().catch(() => {});
+            toggleFullscreenMode().catch((error) => console.warn('Fullscreen toggle failed:', error));
         });
     }
 

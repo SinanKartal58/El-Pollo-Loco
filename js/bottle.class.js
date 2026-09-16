@@ -5,10 +5,10 @@ export default class BottleGround extends DrawableObject {
     y;
     width = 50;
     height = 80;
-    hitboxX = 8;
-    hitboxY = 10;
-    hitboxW = 34;
-    hitboxH = 65;
+    hitboxX = 10;
+    hitboxY = 18;
+    hitboxW = 28;
+    hitboxH = 52;
 
     /**
      * Creates a collectible salsa bottle.

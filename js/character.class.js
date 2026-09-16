@@ -144,11 +144,29 @@ export default class Character extends MovableObject {
      * @returns {void}
      */
     updateAnimationFrame() {
+        const nextState = this.getCurrentAnimationState();
+        if (this.currentAnimationState !== nextState) {
+            this.currentAnimationState = nextState;
+            this.currentImage = 0;
+        }
+
         const now = Date.now();
         const ms = this.getCurrentFrameMs();
         if (now - this.lastFrameAt < ms) return;
         this.lastFrameAt = now;
         this.playAnimation(this.getCurrentAnimationImages());
+    }
+
+    /**
+     * Determines the character animation state for the current gameplay situation.
+     * @returns {string} Current animation state key.
+     */
+    getCurrentAnimationState() {
+        if (this.isDead()) return 'dead';
+        if (this.isHurt()) return 'hurt';
+        if (this.isAboveGround()) return 'jump';
+        if (this.isWalking()) return 'walk';
+        return isLongIdle() ? 'idle-long' : 'idle-short';
     }
 
     /**
