@@ -83,7 +83,7 @@ export default class StatusBar extends DrawableObject {
      * @returns {void}
      */
     setPercentage(percentage) {
-        this.percentage = percentage;
+        this.percentage = Math.max(0, Math.min(100, percentage));
         let path = this.IMAGES[this.resolveImageIndex()];
         this.img = this.imgStore[path];
     }
@@ -93,7 +93,7 @@ export default class StatusBar extends DrawableObject {
      * @returns {number} Status bar image index.
      */
     resolveImageIndex() {
-        return Math.ceil(this.percentage / 20);
+        return Math.min(this.IMAGES.length - 1, Math.ceil(this.percentage / 20));
     }
 }
 

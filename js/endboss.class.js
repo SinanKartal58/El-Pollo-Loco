@@ -44,17 +44,20 @@ export default class Endboss extends MovableObject {
     hitboxW = 280;
     hitboxH = 280;
     speed = 4
-    health = 180
+    maxHealth = 180
+    health = this.maxHealth
     hasBeenTriggered = false
     knockbackActive = false
     isAttacking = false
     attackStartedAt = 0
     attackDirection = 1
     attackCooldownUntil = 0
+    lastBottleHitAt = 0
     ATTACK_DISTANCE = 170
     ATTACK_COOLDOWN = 2200
     ATTACK_DURATION = 500
     ATTACK_SPEED = 11
+    BOTTLE_INVULNERABILITY = 650
 
     /**
      * Creates the end boss at its supplied horizontal position.
@@ -139,6 +142,7 @@ export default class Endboss extends MovableObject {
      */
     chaseCharacter() {
         const distanceToCharacter = this.world.character.x - this.x;
+        this.speed = this.getChaseSpeed();
         if (this.canStartCharge(distanceToCharacter)) {
             this.startChargeAttack(distanceToCharacter);
             return;
@@ -155,6 +159,16 @@ export default class Endboss extends MovableObject {
     canStartCharge(distanceToCharacter) {
         return Math.abs(distanceToCharacter) <= this.ATTACK_DISTANCE
             && Date.now() >= this.attackCooldownUntil;
+    }
+
+    /**
+     * Gets the boss chase speed for its current health phase.
+     * @returns {number} Current chase speed.
+     */
+    getChaseSpeed() {
+        if (this.health <= this.maxHealth * 0.3) return 6;
+        if (this.health <= this.maxHealth * 0.6) return 5;
+        return 4;
     }
 
     /**
@@ -177,7 +191,17 @@ export default class Endboss extends MovableObject {
         this.x += this.attackDirection * this.ATTACK_SPEED;
         if (elapsed < this.ATTACK_DURATION) return;
         this.isAttacking = false;
-        this.attackCooldownUntil = Date.now() + this.ATTACK_COOLDOWN;
+        this.attackCooldownUntil = Date.now() + this.getAttackCooldown();
+    }
+
+    /**
+     * Gets the charge cooldown for the current boss health phase.
+     * @returns {number} Cooldown in milliseconds.
+     */
+    getAttackCooldown() {
+        if (this.health <= this.maxHealth * 0.3) return 900;
+        if (this.health <= this.maxHealth * 0.6) return 1500;
+        return this.ATTACK_COOLDOWN;
     }
 
 
@@ -189,6 +213,22 @@ export default class Endboss extends MovableObject {
     hit(damage) {
         super.hit(damage);
         if (!this.isDead()) this.startKnockback();
+    }
+
+    /**
+     * Checks whether a bottle may damage the boss right now.
+     * @returns {boolean} Whether the boss can receive bottle damage.
+     */
+    canBeHitByBottle() {
+        return Date.now() - this.lastBottleHitAt >= this.BOTTLE_INVULNERABILITY;
+    }
+
+    /**
+     * Records the time of the latest bottle hit.
+     * @returns {void}
+     */
+    recordBottleHit() {
+        this.lastBottleHitAt = Date.now();
     }
 
     /**

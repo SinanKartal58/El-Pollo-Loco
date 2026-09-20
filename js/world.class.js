@@ -151,8 +151,10 @@ export default class World {
     applyBottleHit(enemy, bottle) {
         bottle.break();
         if (enemy instanceof Endboss) {
+            if (!enemy.canBeHitByBottle()) return;
             enemy.hit(22);
-            this.statusBarEndboss.setPercentage(enemy.health);
+            enemy.recordBottleHit();
+            this.statusBarEndboss.setPercentage(this.getEndbossHealthPercentage(enemy));
         } else {
             enemy.kill();
             this.playSound('chickenHit');
@@ -167,6 +169,15 @@ export default class World {
      */
     isBottleHittingGround(bottle) {
         return bottle.speedY <= 0 && bottle.y >= bottle.GROUND_Y;
+    }
+
+    /**
+     * Converts the boss health value to the status bar's percentage scale.
+     * @param {Endboss} endboss Boss whose health should be displayed.
+     * @returns {number} Boss health percentage.
+     */
+    getEndbossHealthPercentage(endboss) {
+        return (endboss.health / endboss.maxHealth) * 100;
     }
 
     /**
@@ -277,11 +288,22 @@ export default class World {
         this.addToMap(this.statusBarCoins);
         this.addToMap(this.statusBarBottles);
         const endboss = this.activeLevel.enemies.find(e => e instanceof Endboss);
-        const isEndbossHealthVisible = Boolean(endboss && endboss.hasBeenTriggered);
+        const isEndbossHealthVisible = Boolean(endboss && this.isEndbossVisible(endboss));
         document.body.classList.toggle('endboss-health-visible', isEndbossHealthVisible);
-        if (endboss && endboss.hasBeenTriggered) {
+        if (endboss && isEndbossHealthVisible) {
             this.addToMap(this.statusBarEndboss);
         }
+    }
+
+    /**
+     * Checks whether the boss is currently inside the camera view.
+     * @param {Endboss} endboss Boss to check.
+     * @returns {boolean} Whether the boss is visible in the game area.
+     */
+    isEndbossVisible(endboss) {
+        const leftEdge = -this.camera_x;
+        const rightEdge = leftEdge + this.canvas.width;
+        return endboss.x < rightEdge && endboss.x + endboss.width > leftEdge;
     }
 
     /**
