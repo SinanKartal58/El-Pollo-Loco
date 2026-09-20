@@ -260,8 +260,8 @@ export default class World {
      */
     drawWorldObjects() {
         this.addObjectsToMap(this.activeLevel.backgroundObjects);
-        this.addObjectsToMap(this.activeLevel.enemies);
         this.addObjectsToMap(this.activeLevel.clouds);
+        this.addObjectsToMap(this.activeLevel.enemies);
         this.addObjectsToMap(this.activeLevel.coins);
         this.addObjectsToMap(this.activeLevel.bottles);
         this.addObjectsToMap(this.activeLevel.throwableBottles);
@@ -392,7 +392,7 @@ export default class World {
         if (!this.sounds || !this.sounds[name]) return;
         const sound = this.sounds[name];
         sound.currentTime = 0;
-        sound.play().catch(() => {});
+        sound.play().catch((error) => console.warn(`Unable to play ${name} sound.`, error));
     }
 
     /**
@@ -407,7 +407,7 @@ export default class World {
             && (this.keyboard.RIGHT_ARROW || this.keyboard.LEFT_ARROW);
 
         if (isWalking && walking.paused) {
-            walking.play().catch(() => {});
+            walking.play().catch((error) => console.warn('Unable to play walking sound.', error));
         } else if (!isWalking && !walking.paused) {
             walking.pause();
             walking.currentTime = 0;

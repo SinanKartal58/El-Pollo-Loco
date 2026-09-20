@@ -30,7 +30,7 @@ import {
 import { resetIdleTimer } from './js/idle-timer.js';
 import { keyboard } from './js/game-state.js';
 import { isNativeFullscreenActive, exitImmersiveMode, toggleFullscreenMode } from './js/fullscreen.js';
-import { updateMobileControlsVisibility, canStartGameInCurrentOrientation, updateOrientationState } from './js/orientation.js';
+import { shouldUseMobileControls, updateMobileControlsVisibility, canStartGameInCurrentOrientation, updateOrientationState } from './js/orientation.js';
 import { closeDialog, closeAllDialogs, hideGameScreens, showMainMenuScreens } from './js/screens.js';
 import { setupMobileControls } from './js/mobile-controls.js';
 import { toggleMute, updateMuteButtonIcon } from './js/audio-ui.js';
@@ -70,6 +70,19 @@ function openDialog(id) {
     dialog.showModal();
 }
 
+/**
+ * Shows the controls explanation matching the current input device.
+ * @returns {void}
+ */
+function updateControlsDialog() {
+    const keyboardControls = document.getElementById('keyboardControls');
+    const touchControls = document.getElementById('touchControls');
+    if (!keyboardControls || !touchControls) return;
+    const mobileDevice = shouldUseMobileControls();
+    keyboardControls.classList.toggle('d-none', mobileDevice);
+    touchControls.classList.toggle('d-none', !mobileDevice);
+}
+
 
 /**
  * Stops the active world and resets movement-related input state.
@@ -99,7 +112,7 @@ function startGame() {
     hideGameScreens();
     hasGameStarted = true;
     createWorld();
-    playBackgroundMusic();
+    playBackgroundMusic().catch((error) => console.warn('Unable to start background music:', error));
     setupKeyboardListeners();
     updateMobileControlsVisibility();
 }
@@ -159,7 +172,7 @@ function restartGame() {
     hideGameScreens();
     hasGameStarted = true;
     createWorld();
-    playBackgroundMusic();
+    playBackgroundMusic().catch((error) => console.warn('Unable to start background music:', error));
     updateMobileControlsVisibility();
 }
 
@@ -283,6 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
     applyMuteState();
     updateMuteButtonIcon();
     updateOrientationState();
+    updateControlsDialog();
     setupMobileControls();
 
     ['click', 'touchstart', 'mousemove', 'keydown'].forEach(type =>

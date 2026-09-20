@@ -72,7 +72,11 @@ export async function toggleFullscreenMode() {
  * @returns {Promise<void>} Resolves after fullscreen is closed.
  */
 async function exitNativeFullscreen() {
-    if (document.exitFullscreen) await document.exitFullscreen().catch(() => {});
+    if (document.exitFullscreen) {
+        await document.exitFullscreen().catch((error) => {
+            console.warn('Unable to exit fullscreen mode.', error);
+        });
+    }
     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
     exitImmersiveMode();
 }
@@ -87,7 +91,8 @@ async function requestNativeFullscreen(gameContainer) {
         if (gameContainer.requestFullscreen) await gameContainer.requestFullscreen();
         else if (gameContainer.webkitRequestFullscreen) gameContainer.webkitRequestFullscreen();
         else enterImmersiveMode();
-    } catch {
+    } catch (error) {
+        console.warn('Fullscreen is unavailable. Using immersive mode instead.', error);
         enterImmersiveMode();
     }
 }

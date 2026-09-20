@@ -54,7 +54,7 @@
             <span aria-hidden="true">&#9654;</span>
         </button>
         <footer>
-            <a href="impressum.html">Impressum</a>
+            <a href="imprint.html">Legal Notice</a>
         </footer>
     </div>
 
@@ -93,9 +93,16 @@
 
     <dialog id="controlsDialog" class="gameDialog">
         <h2>Tasteninfo</h2>
-        <p>Links/Rechts: Pfeiltasten</p>
-        <p>Springen: Leertaste</p>
-        <p>Werfen: Flasche / Werfen-Taste</p>
+        <div id="keyboardControls">
+            <p>Links/Rechts: Pfeiltasten</p>
+            <p>Springen: Leertaste</p>
+            <p>Werfen: D-Taste</p>
+        </div>
+        <div id="touchControls" class="d-none">
+            <p>Bewegen: Linker und rechter Button</p>
+            <p>Springen: Pfeil-nach-oben-Button</p>
+            <p>Werfen: Flaschen-Button</p>
+        </div>
         <button class="dialogCloseButton" onclick="closeDialog('controlsDialog')">Schlie&szlig;en</button>
     </dialog>
 </div>

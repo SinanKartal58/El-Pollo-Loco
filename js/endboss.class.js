@@ -48,7 +48,13 @@ export default class Endboss extends MovableObject {
     hasBeenTriggered = false
     knockbackActive = false
     isAttacking = false
+    attackStartedAt = 0
+    attackDirection = 1
+    attackCooldownUntil = 0
     ATTACK_DISTANCE = 170
+    ATTACK_COOLDOWN = 2200
+    ATTACK_DURATION = 500
+    ATTACK_SPEED = 11
 
     /**
      * Creates the end boss at its supplied horizontal position.
@@ -118,6 +124,7 @@ export default class Endboss extends MovableObject {
     startMovementInterval() {
         setInterval(() => {
             if (!this.world || this.isDead() || this.knockbackActive) return;
+            if (this.isAttacking) return this.updateChargeAttack();
             const bossTriggerX = this.world.activeLevel?.level_end_x ? this.world.activeLevel.level_end_x - 480 : 5200;
             if (!this.hasBeenTriggered && this.world.character.x >= bossTriggerX) {
                 this.hasBeenTriggered = true;
@@ -132,10 +139,45 @@ export default class Endboss extends MovableObject {
      */
     chaseCharacter() {
         const distanceToCharacter = this.world.character.x - this.x;
-        this.isAttacking = Math.abs(distanceToCharacter) <= this.ATTACK_DISTANCE;
-        if (this.isAttacking) return;
+        if (this.canStartCharge(distanceToCharacter)) {
+            this.startChargeAttack(distanceToCharacter);
+            return;
+        }
         if (distanceToCharacter < 0) this.moveLeft();
         else this.moveRight();
+    }
+
+    /**
+     * Checks whether the boss can begin a close-range charge.
+     * @param {number} distanceToCharacter Signed distance to the character.
+     * @returns {boolean} Whether a charge can start.
+     */
+    canStartCharge(distanceToCharacter) {
+        return Math.abs(distanceToCharacter) <= this.ATTACK_DISTANCE
+            && Date.now() >= this.attackCooldownUntil;
+    }
+
+    /**
+     * Starts a short, telegraphed charge toward the character.
+     * @param {number} distanceToCharacter Signed distance to the character.
+     * @returns {void}
+     */
+    startChargeAttack(distanceToCharacter) {
+        this.isAttacking = true;
+        this.attackDirection = distanceToCharacter < 0 ? -1 : 1;
+        this.attackStartedAt = Date.now();
+    }
+
+    /**
+     * Advances the active charge and applies its cooldown after impact.
+     * @returns {void}
+     */
+    updateChargeAttack() {
+        const elapsed = Date.now() - this.attackStartedAt;
+        this.x += this.attackDirection * this.ATTACK_SPEED;
+        if (elapsed < this.ATTACK_DURATION) return;
+        this.isAttacking = false;
+        this.attackCooldownUntil = Date.now() + this.ATTACK_COOLDOWN;
     }
 
 

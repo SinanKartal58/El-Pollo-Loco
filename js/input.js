@@ -26,9 +26,9 @@ export function toggleFullscreen() {
 	const container = getGameContainer();
 	if (!container) return;
 	if (document.fullscreenElement) {
-		document.exitFullscreen().catch(() => {});
+		document.exitFullscreen().catch((error) => console.warn('Unable to exit fullscreen mode.', error));
 	} else if (container.requestFullscreen) {
-		container.requestFullscreen().catch(() => {});
+		container.requestFullscreen().catch((error) => console.warn('Unable to enter fullscreen mode.', error));
 	}
 }
 

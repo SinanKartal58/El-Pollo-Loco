@@ -3,6 +3,7 @@
  */
 let audioContext = null;
 let muted = false;
+let audioWarningShown = false;
 
 /**
  * Checks whether game audio is currently muted.
@@ -27,9 +28,14 @@ export function setAudioMuted(value) {
  */
 export function getAudioContext() {
     if (!audioContext) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return null;
-        audioContext = new AudioCtx();
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return null;
+            audioContext = new AudioCtx();
+        } catch (error) {
+            reportAudioIssue('Unable to create the audio context.', error);
+            return null;
+        }
     }
     return audioContext;
 }
@@ -42,9 +48,21 @@ export function ensureAudioContextReady() {
     const ctx = getAudioContext();
     if (!ctx) return false;
     if (ctx.state === 'suspended') {
-        ctx.resume().catch(() => {});
+        ctx.resume().catch((error) => reportAudioIssue('Unable to resume the audio context.', error));
     }
     return ctx.state !== 'closed';
+}
+
+/**
+ * Reports an audio failure once and leaves gameplay available without sound.
+ * @param {string} message Explanation of the audio failure.
+ * @param {unknown} error Original error from the browser.
+ * @returns {void}
+ */
+function reportAudioIssue(message, error) {
+    if (audioWarningShown) return;
+    audioWarningShown = true;
+    console.warn(message, error);
 }
 
 /**

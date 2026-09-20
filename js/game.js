@@ -70,7 +70,7 @@ function showWinScreen() {
     stopActiveGameSession();
     stopAllSoundsOnWin();
     winSound.currentTime = 0;
-    winSound.play().catch(() => {});
+    winSound.play().catch((error) => console.warn('Unable to play win sound:', error));
     document.getElementById('gameOverScreen').classList.add('d-none');
     document.getElementById('win-screen').classList.remove('d-none');
 }
@@ -85,7 +85,7 @@ function stopAllSoundsOnGameOver() {
     winSound.currentTime = 0;
     lostSound.pause();
     lostSound.currentTime = 0;
-    lostSound.play().catch(() => {});
+    lostSound.play().catch((error) => console.warn('Unable to play lose sound:', error));
 }
 
 

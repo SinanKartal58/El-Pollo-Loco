@@ -10,7 +10,8 @@ const MUTE_STORAGE_KEY = 'elPolloMuted';
 
 try {
     setAudioMuted(localStorage.getItem(MUTE_STORAGE_KEY) === 'true');
-} catch {
+} catch (error) {
+	console.warn('Unable to read mute state. Audio starts unmuted.', error);
     setAudioMuted(false);
 }
 
@@ -65,7 +66,8 @@ export const chickenHitSound = new BurstSound([
 export function applyMuteState() {
 	try {
 		setAudioMuted(localStorage.getItem(MUTE_STORAGE_KEY) === 'true');
-	} catch {
+	} catch (error) {
+		console.warn('Unable to read mute state. Audio starts unmuted.', error);
 		setAudioMuted(false);
 	}
 
